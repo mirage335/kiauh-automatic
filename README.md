@@ -5,7 +5,7 @@ See license.txt for kiauh-automatic license conditions.
 
 Imports functions from neighboring 'kiauh' directory, wraps some new functions, to automate the apparently otherwise menu based installer.
 
-Trivial shell script, hopefully self-explanatory.
+Trivial shell script, hopefully self-explanatory, "auto.sh" .
 
 
 
