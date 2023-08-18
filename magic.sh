@@ -622,7 +622,7 @@ _install_mainsail_procedure() {
 	### confirm message
 	print_confirm "Mainsail has been set up!"
 }
-
+export -f _install_mainsail_procedure
 _install_crowsnest_procedure() {
 	# Step 1: jump to home directory
 	pushd "${HOME}" &> /dev/null || exit 1
@@ -654,6 +654,7 @@ _install_crowsnest_procedure() {
 	popd &> /dev/null || exit 1
 	popd &> /dev/null || exit 1
 }
+export -f _install_crowsnest_procedure
 
 
 _set_kiauh() {
@@ -665,6 +666,9 @@ _set_kiauh() {
 	
 	#moonraker_setup_dialog
 	moonraker_count=1
+	
+	export CROWSNEST_UNATTENDED=1
+	export CROWSNEST_ADD_CROWSNEST_MOONRAKER=1
 }
 export -f _set_kiauh
 
