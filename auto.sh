@@ -170,7 +170,116 @@ check_euid
 init_logfile
 set_globals
 
+
+_install_mainsail_procedure() {
+	### checking dependencies
+	local dep=(wget nginx)
+	dependency_check "${dep[@]}"
+	### detect conflicting Haproxy and Apache2 installations
+	detect_conflicting_packages
+
+	status_msg "Initializing Mainsail installation ..."
+	### first, we create a backup of the full klipper_config dir - safety first!
+	#backup_klipper_config_dir
+
+	### check for other enabled web interfaces
+	unset SET_LISTEN_PORT
+	detect_enabled_sites
+
+	### check if another site already listens to port 80
+	mainsail_port_check
+
+	### download mainsail
+	download_mainsail
+	
+	# ATTENTION: Non-interactive preferred instead.
+	### ask user to install the recommended webinterface macros
+	#install_mainsail_macros
+	download_mainsail_macros
+
+	### create /etc/nginx/conf.d/upstreams.conf
+	set_upstream_nginx_cfg
+	### create /etc/nginx/sites-available/<interface config>
+	set_nginx_cfg "mainsail"
+	### nginx on ubuntu 21 and above needs special permissions to access the files
+	set_nginx_permissions
+
+	### symlink nginx log
+	symlink_webui_nginx_log "mainsail"
+
+	### add mainsail to the update manager in moonraker.conf
+	patch_mainsail_update_manager
+
+	fetch_webui_ports #WIP
+
+	### confirm message
+	print_confirm "Mainsail has been set up!"
+}
+
+_install_crowsnest_procedure() {
+	# Step 1: jump to home directory
+	pushd "${HOME}" &> /dev/null || exit 1
+	
+	# Step 2: Clone crowsnest repo
+	status_msg "Cloning 'crowsnest' repository ..."
+	if [[ ! -d "${HOME}/crowsnest" && -z "$(ls -A "${HOME}/crowsnest" 2> /dev/null)" ]]; then
+		clone_crowsnest
+	else
+		ok_msg "crowsnest repository already exists ..."
+	fi
+	
+	# Step 3: Install dependencies
+	dependency_check git make
+	
+	# Step 4: Check for Multi Instance
+	check_multi_instance
+	
+	# Step 5: Launch crowsnest installer
+	pushd "${HOME}/crowsnest" &> /dev/null || exit 1
+	title_msg "Installer will prompt you for sudo password!"
+	status_msg "Launching crowsnest installer ..."
+	if ! sudo -n --preserve-env=CROWSNEST_UNATTENDED,CROWSNEST_ADD_CROWSNEST_MOONRAKER make install BASE_USER=$USER; then
+		error_msg "Something went wrong! Please try again..."
+		exit 1
+	fi
+	
+	# Step 5: Leave directory (twice due two pushd)
+	popd &> /dev/null || exit 1
+	popd &> /dev/null || exit 1
+}
+
+echo '---------- klipper'
+echo '------------------------------'
+python_version=3
+instance_count=1
+instance_names+=("printer")
+use_custom_names="false"
+#start_klipper_setup
+run_klipper_setup "${python_version}" "${instance_names[@]}"
+# systemctl status klipper
+
+echo '---------- moonraker'
+echo '------------------------------'
+moonraker_count=1
+#moonraker_setup_dialog
+moonraker_setup "$moonraker_count"
+
+
+echo '---------- klipperscreen'
+echo '------------------------------'
 install_klipperscreen
 # systemctl status KlipperScreen
+
+echo '---------- mainsail'
+echo '------------------------------'
+#install_mainsail
+_install_mainsail_procedure
+
+echo '---------- crowsnest'
+echo '------------------------------'
+export CROWSNEST_UNATTENDED=1
+export CROWSNEST_ADD_CROWSNEST_MOONRAKER=1
+#install_crowsnest
+_install_crowsnest_procedure
 
 
