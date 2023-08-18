@@ -521,6 +521,7 @@ _detect_kiauh() {
 	export currentSoftwareFolder_kiauh="$1"
 	return
 }
+export -f _detect_kiauh
 _discover_kiauh() {
 	export currentSoftwareFolder_kiauh=""
 	#_detect_kiauh "$scriptLib"/kiauh && return 0
@@ -533,6 +534,7 @@ _discover_kiauh() {
 	_stop 1
 	return 1
 }
+export -f _discover_kiauh
 _include_kiauh() {
 	_discover_kiauh
 	
@@ -545,19 +547,34 @@ _include_kiauh() {
 	
 	return 0
 }
+export -f _include_kiauh
 
 _call_function_procedure_kiauh() {
 	_include_kiauh
+	
+	check_euid
+	init_logfile
+	set_globals
+	
 	"$@"
 }
+export -f _call_function_procedure_kiauh
 _call_function_kiauh() {
 	# ATTENTION: Safely isolates the shell environment from being changed by kiauh scripts.
 	"$scriptAbsoluteLocation" _call_function_procedure_kiauh "$@"
 }
+export -f _call_function_kiauh
+
+_bash_kiauh() {
+	# Alternative - usually '_scope' would take care of this and more.
+	_visualPrompt
+	/usr/bin/env bash --norc
+}
 
 
-_main() {
+_enter() {
 	_call_function_kiauh install_klipperscreen
+	# systemctl status KlipperScreen
 }
 
 
@@ -574,14 +591,14 @@ _test_prog() {
 	_discover_kiauh
 }
 _main() {
-	#_start
-	_start scriptLocal_mkdir_disable
+	##_start
+	#_start scriptLocal_mkdir_disable
 	
-	_collect
+	#_collect
 	
 	_enter "$@"
 	
-	_stop
+	#_stop
 }
 if [[ "$1" == '_test' ]]
 then
