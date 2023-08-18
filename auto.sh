@@ -512,68 +512,19 @@ true
 
 
 
-
-_detect_kiauh() {
-	export currentSoftwareFolder_kiauh=""
-	! [[ -e "$1"/kiauh.sh ]] && return 1
-	! [[ -e "$1"/scripts/klipper.sh ]] && return 1
+_enter() {
+	KIAUH_SRCDIR="$scriptAbsoluteFolder"/kiauh
 	
-	export currentSoftwareFolder_kiauh="$1"
-	return
-}
-export -f _detect_kiauh
-_discover_kiauh() {
-	export currentSoftwareFolder_kiauh=""
-	#_detect_kiauh "$scriptLib"/kiauh && return 0
-	_detect_kiauh "$scriptAbsoluteFolder"/kiauh && return 0
-	#_detect_kiauh "$scriptAbsoluteFolder"/../kiauh && return 0
-	#_detect_kiauh "$HOME"/core/installations/kiauh && return 0
+	! [[ -e "$KIAUH_SRCDIR"/kiauh.sh ]] && return 1
 	
-	_messagePlain_bad 'fail: missing: kiauh'
-	_messageFAIL
-	_stop 1
-	return 1
-}
-export -f _discover_kiauh
-_include_kiauh() {
-	_discover_kiauh
-	
-	KIAUH_SRCDIR="$currentSoftwareFolder_kiauh"
 	for script in "${KIAUH_SRCDIR}/scripts/"*.sh; do . "${script}"; done
 	for script in "${KIAUH_SRCDIR}/scripts/ui/"*.sh; do . "${script}"; done
-	
-	# CAUTION: Seems 'kiauth' scripts add their own TRAP . If temporary directories (ie. "$safeTmp") managed by "_start", "_stop", are needed, then use "_include_kauth" only under a recursive call through "$scriptAbsoluteLocation" to isolate the shell environment.
-	#exit 0
-	
-	return 0
-}
-export -f _include_kiauh
-
-_call_function_procedure_kiauh() {
-	_include_kiauh
 	
 	check_euid
 	init_logfile
 	set_globals
 	
-	"$@"
-}
-export -f _call_function_procedure_kiauh
-_call_function_kiauh() {
-	# ATTENTION: Safely isolates the shell environment from being changed by kiauh scripts.
-	"$scriptAbsoluteLocation" _call_function_procedure_kiauh "$@"
-}
-export -f _call_function_kiauh
-
-_bash_kiauh() {
-	# Alternative - usually '_scope' would take care of this and more.
-	_visualPrompt
-	/usr/bin/env bash --norc
-}
-
-
-_enter() {
-	_call_function_kiauh install_klipperscreen
+	install_klipperscreen
 	# systemctl status KlipperScreen
 }
 
