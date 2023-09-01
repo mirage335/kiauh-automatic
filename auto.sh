@@ -283,3 +283,41 @@ export CROWSNEST_ADD_CROWSNEST_MOONRAKER=1
 _install_crowsnest_procedure
 
 
+echo '---------- disable: services'
+echo '------------------------------'
+sudo -n mkdir -p /root/systemd/etc--systemd--system
+sudo -n mkdir -p /root/systemd/lib--systemd--system
+
+sudo -n systemctl disable KlipperScreen
+systemctl disable KlipperScreen.service
+sudo -n systemctl stop KlipperScreen
+systemctl stop KlipperScreen.service
+
+sudo -n systemctl disable crowsnest
+systemctl disable crowsnest.service
+sudo -n systemctl stop crowsnest
+systemctl stop crowsnest.service
+
+sudo -n systemctl disable mainsail
+systemctl disable mainsail.service
+sudo -n systemctl stop mainsail
+systemctl stop mainsail.service
+
+sudo -n systemctl disable nginx
+systemctl disable nginx.service
+sudo -n systemctl mask nginx
+systemctl mask nginx.service
+sudo -n systemctl stop nginx
+systemctl stop nginx.service
+
+sudo -n systemctl disable moonraker
+systemctl disable moonraker.service
+sudo -n systemctl stop moonraker
+systemctl stop moonraker.service
+
+sudo -n systemctl disable klipper
+systemctl disable klipper.service
+sudo -n systemctl stop klipper
+systemctl stop klipper.service
+
+

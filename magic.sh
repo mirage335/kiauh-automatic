@@ -672,6 +672,18 @@ _set_kiauh() {
 }
 export -f _set_kiauh
 
+_disableService() {
+	sudo -n mkdir -p /root/systemd/etc--systemd--system
+	sudo -n mkdir -p /root/systemd/lib--systemd--system
+	
+	sudo -n systemctl disable "$1"
+	systemctl disable "$1".service
+	sudo -n systemctl mask "$1"
+	systemctl mask "$1".service
+	sudo -n systemctl stop "$1"
+	systemctl stop "$1".service
+}
+
 _enter() {
 	_set_kiauh
 	
@@ -686,6 +698,22 @@ _enter() {
 	_call_function_kiauh _install_mainsail_procedure
 	
 	_call_function_kiauh _install_crowsnest_procedure
+	
+	
+	_disableService KlipperScreen
+	
+	_disableService crowsnest
+	
+	_disableService mainsail
+	
+	_disableService nginx
+	
+	_disableService moonraker
+	
+	_disableService klipper
+	
+	
+	_messageNormal 
 }
 
 
