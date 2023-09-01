@@ -673,6 +673,8 @@ _set_kiauh() {
 export -f _set_kiauh
 
 _disableService() {
+	_messageNormal 'init: _disableService: '"$1"
+	
 	sudo -n mkdir -p /root/systemd/etc--systemd--system
 	sudo -n mkdir -p /root/systemd/lib--systemd--system
 	
@@ -711,9 +713,6 @@ _enter() {
 	_disableService moonraker
 	
 	_disableService klipper
-	
-	
-	_messageNormal 
 }
 
 
